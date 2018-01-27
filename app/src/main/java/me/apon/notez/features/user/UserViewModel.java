@@ -4,15 +4,17 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
-import io.reactivex.Observer;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import me.apon.notez.data.model.BaseResponse;
 import me.apon.notez.data.model.Login;
 import me.apon.notez.data.model.Response;
 import me.apon.notez.data.model.SyncState;
 import me.apon.notez.data.model.User;
+import me.apon.notez.network.NConsumer;
+import me.apon.notez.network.NObserver;
 import me.apon.notez.network.RetrofitClient;
 import me.apon.notez.network.api.UserApi;
 
@@ -22,7 +24,17 @@ import me.apon.notez.network.api.UserApi;
 
 public class UserViewModel extends ViewModel {
 
+    private CompositeDisposable compositeDisposable;
 
+    public UserViewModel() {
+        compositeDisposable = new CompositeDisposable();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        compositeDisposable.clear();
+    }
 
     //登录
     private MutableLiveData<Response> loginResponse = new MutableLiveData<>();
@@ -34,33 +46,10 @@ public class UserViewModel extends ViewModel {
     public void Login(String email, String pwd){
         RetrofitClient.service(UserApi.class)
                 .login(email,pwd)
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(Disposable disposable) throws Exception {
-                        loginResponse.setValue(Response.loading());
-                    }
-                })
-                .subscribe(new Observer<Login>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull Login login) {
-                        loginResponse.setValue(Response.success(login));
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        loginResponse.setValue(Response.error(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new NConsumer(logoutResponse,compositeDisposable))
+                .subscribe(new NObserver<Login>(loginResponse));
     }
 
     //注销
@@ -73,33 +62,10 @@ public class UserViewModel extends ViewModel {
     public void logout(String token){
         RetrofitClient.service(UserApi.class)
                 .logout(token)
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(Disposable disposable) throws Exception {
-                        logoutResponse.setValue(Response.loading());
-                    }
-                })
-                .subscribe(new Observer<BaseResponse>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull BaseResponse baseResponse) {
-                        logoutResponse.setValue(Response.success(baseResponse));
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        logoutResponse.setValue(Response.error(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new NConsumer(logoutResponse,compositeDisposable))
+                .subscribe(new NObserver<BaseResponse>(logoutResponse));
     }
 
     //注册
@@ -112,33 +78,10 @@ public class UserViewModel extends ViewModel {
     public void register(String email,String pwd){
         RetrofitClient.service(UserApi.class)
                 .register(email,pwd)
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(Disposable disposable) throws Exception {
-                        registerResponse.setValue(Response.loading());
-                    }
-                })
-                .subscribe(new Observer<BaseResponse>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull BaseResponse baseResponse) {
-                        registerResponse.setValue(Response.success(baseResponse));
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        registerResponse.setValue(Response.error(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new NConsumer(registerResponse,compositeDisposable))
+                .subscribe(new NObserver<BaseResponse>(registerResponse));
     }
 
     //用户信息
@@ -151,33 +94,10 @@ public class UserViewModel extends ViewModel {
     public void userInfo(String userid){
         RetrofitClient.service(UserApi.class)
                 .userInfo(userid)
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(Disposable disposable) throws Exception {
-                        userInfoResponse.setValue(Response.loading());
-                    }
-                })
-                .subscribe(new Observer<User>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull User user) {
-                        registerResponse.setValue(Response.success(user));
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        registerResponse.setValue(Response.error(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new NConsumer(userInfoResponse,compositeDisposable))
+                .subscribe(new NObserver<User>(userInfoResponse));
     }
 
     //修改用户名
@@ -190,33 +110,10 @@ public class UserViewModel extends ViewModel {
     public void updateName(String userName){
         RetrofitClient.service(UserApi.class)
                 .updateUserName(userName)
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(Disposable disposable) throws Exception {
-                        updateNameResponse.setValue(Response.loading());
-                    }
-                })
-                .subscribe(new Observer<BaseResponse>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull BaseResponse baseResponse) {
-                        updateNameResponse.setValue(Response.success(baseResponse));
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        updateNameResponse.setValue(Response.error(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new NConsumer(updateNameResponse,compositeDisposable))
+                .subscribe(new NObserver<BaseResponse>(updateNameResponse));
     }
 
     //修改密码
@@ -229,33 +126,10 @@ public class UserViewModel extends ViewModel {
     public void updatePwd(String oldpwd,String pwd){
         RetrofitClient.service(UserApi.class)
                 .updatePwd(oldpwd,pwd)
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(Disposable disposable) throws Exception {
-                        updatePwdResponse.setValue(Response.loading());
-                    }
-                })
-                .subscribe(new Observer<BaseResponse>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull BaseResponse baseResponse) {
-                        updatePwdResponse.setValue(Response.success(baseResponse));
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        updatePwdResponse.setValue(Response.error(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new NConsumer(updatePwdResponse,compositeDisposable))
+                .subscribe(new NObserver<BaseResponse>(updatePwdResponse));
     }
 
 
@@ -269,32 +143,9 @@ public class UserViewModel extends ViewModel {
     public void getSyncState(){
         RetrofitClient.service(UserApi.class)
                 .getSyncState()
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(Disposable disposable) throws Exception {
-                        syncStateResponse.setValue(Response.loading());
-                    }
-                })
-                .subscribe(new Observer<SyncState>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull SyncState syncState) {
-                        syncStateResponse.setValue(Response.success(syncState));
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        syncStateResponse.setValue(Response.error(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new NConsumer(syncStateResponse,compositeDisposable))
+                .subscribe(new NObserver<SyncState>(syncStateResponse));
     }
 }

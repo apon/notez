@@ -40,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity{
                 break;
             case SUCCESS:
                 BaseResponse baseResponse = (BaseResponse) response.data;
-                if (baseResponse.isOk()){
+                if (baseResponse!=null&&baseResponse.isOk()){
 
                 }else {
 
@@ -48,7 +48,9 @@ public class RegisterActivity extends AppCompatActivity{
                 break;
             case ERROR:
                 Throwable e = response.error;
-                String msg = e.getMessage();
+                if (e!=null) {
+                    String msg = e.getMessage();
+                }
                 break;
         }
     }

@@ -26,38 +26,45 @@ public class RetrofitClient {
     private RetrofitClient(){}
 
     public static <T> T service(final Class<T> service) {
-        return getRetrofit("").create(service);
+        return getRetrofit("http://note.apon.me").create(service);
+    }
+
+    public static OkHttpClient.Builder getBuilder(){
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        if (BuildConfig.DEBUG){//Stetho
+            builder.addNetworkInterceptor(new StethoInterceptor());
+        }
+        /**
+         * Log信息拦截器
+         */
+
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLogger());
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        builder.addInterceptor(loggingInterceptor);
+        /**
+         * 设置cookie
+         */
+
+        /**
+         * 设置超时和重连
+         */
+        builder.connectTimeout(10, TimeUnit.SECONDS);
+        builder.readTimeout(10, TimeUnit.SECONDS);
+        builder.writeTimeout(10, TimeUnit.SECONDS);
+        builder.retryOnConnectionFailure(true);
+
+        return builder;
     }
 
     public static Retrofit getRetrofit(String host){
         if (mRetrofit == null) {
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            if (BuildConfig.DEBUG){//Stetho
-                builder.addNetworkInterceptor(new StethoInterceptor());
-            }
-            /**
-             * Log信息拦截器
-             */
 
-            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLogger());
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            builder.addInterceptor(loggingInterceptor);
-            /**
-             * 设置cookie
-             */
-
-            /**
-             * 设置超时和重连
-             */
-            builder.connectTimeout(10, TimeUnit.SECONDS);
-            builder.readTimeout(10, TimeUnit.SECONDS);
-            builder.writeTimeout(10, TimeUnit.SECONDS);
-            builder.retryOnConnectionFailure(true);
             mRetrofit = new Retrofit.Builder()
                     .baseUrl(host)
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .client(builder.build())
+                    .client(getBuilder().build())
                     .build();
         }
         return mRetrofit;
