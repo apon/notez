@@ -2,6 +2,7 @@ package me.apon.notez.app;
 
 import android.app.Application;
 
+import com.orhanobut.logger.Logger;
 import com.squareup.leakcanary.LeakCanary;
 
 import me.apon.notez.BuildConfig;
@@ -28,5 +29,6 @@ public class NoteApp extends Application{
         if (BuildConfig.DEBUG){
             LeakCanary.install(this);
         }
+        //Logger.addLogAdapter(new AndroidLogAdapter());
     }
 }

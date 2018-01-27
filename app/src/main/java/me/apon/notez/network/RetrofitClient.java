@@ -3,10 +3,14 @@ package me.apon.notez.network;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import me.apon.notez.BuildConfig;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -42,6 +46,17 @@ public class RetrofitClient {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLogger());
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         builder.addInterceptor(loggingInterceptor);
+
+        builder.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request request = chain.request()
+                        .newBuilder()
+                        .addHeader("Connection","close")
+                        .build();
+                return chain.proceed(request);
+            }
+        });
         /**
          * 设置cookie
          */

@@ -40,6 +40,11 @@ public class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> 
     public T convert(ResponseBody value) throws IOException {
         String response = value.string();
 
+        BaseResponse baseResponse = gson.fromJson(response, BaseResponse.class);
+        if (!baseResponse.isOk()){
+            throw new ApiException(false,baseResponse.getMsg());
+        }
+
         MediaType contentType = value.contentType();
         Charset charset = contentType != null ? contentType.charset(UTF_8) : UTF_8;
         InputStream inputStream = new ByteArrayInputStream(response.getBytes());
@@ -49,8 +54,8 @@ public class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> 
         try {
             return adapter.read(jsonReader);
         } catch (Exception ex){
-            BaseResponse baseResponse = gson.fromJson(response, BaseResponse.class);
-            throw new ApiException(false,baseResponse.getMsg());
+            //BaseResponse baseResponse = gson.fromJson(response, BaseResponse.class);
+            throw new ApiException(false,ex.getMessage());
         }finally {
             value.close();
         }

@@ -48,7 +48,7 @@ public class UserViewModel extends ViewModel {
                 .login(email,pwd)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(new NConsumer(logoutResponse,compositeDisposable))
+                .doOnSubscribe(new NConsumer(loginResponse,compositeDisposable))
                 .subscribe(new NObserver<Login>(loginResponse));
     }
 

@@ -23,7 +23,7 @@ public interface UserApi {
     Observable<BaseResponse> logout(@Query("token")String token);
 
     @POST("/api/auth/register")
-    Observable<BaseResponse> register(@Field("email")String email,@Field("pwd")String pwd);
+    Observable<BaseResponse> register(@Query("email") String email,@Query("pwd") String pwd);
 
     @GET("/api/user/info")
     Observable<User> userInfo(@Query("userId")String userId);
