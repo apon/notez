@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Notez</string>
+    <string name="hello">hello</string>
+    <string name="action_settings">Settings</string>
 </resources>
