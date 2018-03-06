@@ -1,5 +1,8 @@
 package me.apon.notez.data.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -7,7 +10,7 @@ import java.util.List;
 /**
  * Created by yaopeng(aponone@gmail.com) on 2018/1/26.
  */
-
+@Entity(tableName = "notes")
 public class Note {
     @SerializedName("NoteId")
     String noteId;
@@ -39,6 +42,17 @@ public class Note {
     // 更新序号
     @SerializedName("Usn")
     int usn;
+
+    @PrimaryKey(autoGenerate = true)
+    Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getNoteId() {
         return noteId;

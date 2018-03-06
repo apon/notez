@@ -19,7 +19,7 @@ public class BaseResponse {
      */
 
     @SerializedName("Ok")
-    private boolean Ok;
+    private boolean Ok = true;
     @SerializedName("Msg")
     private String Msg;
 

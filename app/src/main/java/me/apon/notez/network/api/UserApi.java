@@ -6,6 +6,7 @@ import me.apon.notez.data.model.Login;
 import me.apon.notez.data.model.SyncState;
 import me.apon.notez.data.model.User;
 import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -20,7 +21,7 @@ public interface UserApi {
     Observable<Login> login(@Query("email")String email,@Query("pwd")String pwd);
 
     @GET("/api/auth/logout")
-    Observable<BaseResponse> logout(@Query("token")String token);
+    Observable<BaseResponse> logout();
 
     @POST("/api/auth/register")
     Observable<BaseResponse> register(@Query("email") String email,@Query("pwd") String pwd);
@@ -28,9 +29,11 @@ public interface UserApi {
     @GET("/api/user/info")
     Observable<User> userInfo(@Query("userId")String userId);
 
+    @FormUrlEncoded
     @POST("/api/user/updateUsername")
     Observable<BaseResponse> updateUserName(@Field("username") String username);
 
+    @FormUrlEncoded
     @POST("/api/user/updatePwd")
     Observable<BaseResponse> updatePwd(@Field("oldPwd")String oldPwd,@Field("pwd")String pwd);
 

@@ -3,11 +3,18 @@ package me.apon.notez.features.user;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.text.TextUtils;
 
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import me.apon.notez.data.database.dao.AccountDao;
+import me.apon.notez.data.model.Account;
 import me.apon.notez.data.model.BaseResponse;
 import me.apon.notez.data.model.Login;
 import me.apon.notez.data.model.Response;
@@ -24,10 +31,13 @@ import me.apon.notez.network.api.UserApi;
 
 public class UserViewModel extends ViewModel {
 
+    private AccountDao accountDataSource;
+
     private CompositeDisposable compositeDisposable;
 
-    public UserViewModel() {
+    public UserViewModel(AccountDao accountDataSource) {
         compositeDisposable = new CompositeDisposable();
+        this.accountDataSource = accountDataSource;
     }
 
     @Override
@@ -44,12 +54,36 @@ public class UserViewModel extends ViewModel {
     }
 
     public void Login(String email, String pwd){
+        if (TextUtils.isEmpty(email)){
+            loginResponse.setValue(Response.error(new Exception("邮箱地址不能为空！")));
+            return;
+        }
+        if (TextUtils.isEmpty(pwd)){
+            loginResponse.setValue(Response.error(new Exception("密码不能为空！")));
+            return;
+        }
         RetrofitClient.service(UserApi.class)
                 .login(email,pwd)
+                .flatMap(new Function<Login, ObservableSource<Account>>() {
+                    @Override
+                    public ObservableSource<Account> apply(@NonNull Login login) throws Exception {
+                        //登录信息保存到数据库
+                        Account localAccount = accountDataSource.getAccount(login.getEmail());
+                        if (localAccount == null) {
+                            localAccount = new Account();
+                        }
+                        localAccount.setEmail(login.getEmail());
+                        localAccount.setToken(login.getToken());
+                        localAccount.setUserId(login.getUserId());
+                        localAccount.setUsername(login.getUsername());
+                        accountDataSource.addAccount(localAccount);
+                        return Observable.fromArray(localAccount);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(new NConsumer(loginResponse,compositeDisposable))
-                .subscribe(new NObserver<Login>(loginResponse));
+                .subscribe(new NObserver<Account>(loginResponse));
     }
 
     //注销
@@ -59,9 +93,19 @@ public class UserViewModel extends ViewModel {
         return logoutResponse;
     }
 
-    public void logout(String token){
+    public void logout(){
+
         RetrofitClient.service(UserApi.class)
-                .logout(token)
+                .logout()
+                .flatMap(new Function<BaseResponse, ObservableSource<BaseResponse>>() {
+                    @Override
+                    public ObservableSource<BaseResponse> apply(@NonNull BaseResponse baseResponse) throws Exception {
+                        Account account = accountDataSource.getCurrent();
+                        String token = account.getToken();
+                        accountDataSource.deleteAccout(token);//删除本地用户信息
+                        return Observable.fromArray(baseResponse);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(new NConsumer(logoutResponse,compositeDisposable))
@@ -76,6 +120,14 @@ public class UserViewModel extends ViewModel {
     }
 
     public void register(String email,String pwd){
+        if (TextUtils.isEmpty(email)){
+            registerResponse.setValue(Response.error(new Exception("邮箱地址不能为空！")));
+            return;
+        }
+        if (TextUtils.isEmpty(pwd)){
+            registerResponse.setValue(Response.error(new Exception("密码不能为空！")));
+            return;
+        }
         RetrofitClient.service(UserApi.class)
                 .register(email,pwd)
                 .subscribeOn(Schedulers.io())
@@ -94,10 +146,27 @@ public class UserViewModel extends ViewModel {
     public void userInfo(String userid){
         RetrofitClient.service(UserApi.class)
                 .userInfo(userid)
+                .flatMap(new Function<User, ObservableSource<Account>>() {
+                    @Override
+                    public ObservableSource<Account> apply(@NonNull User user) throws Exception {
+                        //用户信息保存到数据库
+                        Account localAccount = accountDataSource.getAccount(user.getEmail());
+                        if (localAccount == null) {
+                            localAccount = new Account();
+                        }
+                        localAccount.setEmail(user.getEmail());
+                        localAccount.setUserId(user.getUserId());
+                        localAccount.setUsername(user.getUsername());
+                        localAccount.setLogo(user.getLogo());
+                        localAccount.setVerified(user.isVerified());
+                        accountDataSource.addAccount(localAccount);
+                        return Observable.fromArray(localAccount);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(new NConsumer(userInfoResponse,compositeDisposable))
-                .subscribe(new NObserver<User>(userInfoResponse));
+                .subscribe(new NObserver<Account>(userInfoResponse));
     }
 
     //修改用户名
@@ -107,13 +176,26 @@ public class UserViewModel extends ViewModel {
         return updateNameResponse;
     }
 
-    public void updateName(String userName){
+    public void updateName(final String userName){
+        if (TextUtils.isEmpty(userName)){
+            updateNameResponse.setValue(Response.error(new Exception("用户名不能为空！")));
+            return;
+        }
         RetrofitClient.service(UserApi.class)
                 .updateUserName(userName)
+                .flatMap(new Function<BaseResponse, ObservableSource<Account>>() {
+                    @Override
+                    public ObservableSource<Account> apply(@NonNull BaseResponse baseResponse) throws Exception {
+                        Account localAccount = accountDataSource.getCurrent();//修改成功后修改本地数据
+                        localAccount.setUsername(userName);
+                        accountDataSource.addAccount(localAccount);
+                        return Observable.fromArray(localAccount);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(new NConsumer(updateNameResponse,compositeDisposable))
-                .subscribe(new NObserver<BaseResponse>(updateNameResponse));
+                .subscribe(new NObserver<Account>(updateNameResponse));
     }
 
     //修改密码

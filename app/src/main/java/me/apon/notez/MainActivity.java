@@ -1,30 +1,43 @@
 package me.apon.notez;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.apon.notez.data.database.AppDatabase;
+import me.apon.notez.data.database.dao.AccountDao;
+import me.apon.notez.data.model.Account;
+import me.apon.notez.data.model.Response;
+import me.apon.notez.features.home.AboutActivity;
 import me.apon.notez.features.home.RecentNoteFragment;
+import me.apon.notez.features.note.NoteEditorActivity;
+import me.apon.notez.features.user.LoginActivity;
+import me.apon.notez.features.user.SettingActivity;
+import me.apon.notez.features.user.UserViewModel;
+import me.apon.notez.features.user.UserViewModelFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
     int position = 0;
 
     List<Fragment> fragmentList = new ArrayList<>();
+
+    UserViewModel userViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +70,26 @@ public class MainActivity extends AppCompatActivity {
             supportActionBar.setHomeAsUpIndicator(indicator);
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
+        //////
+        AccountDao accountDao = AppDatabase.getInstance(this).accountDao();
+
+        userViewModel = ViewModelProviders.of(this,new UserViewModelFactory(accountDao)).get(UserViewModel.class);
+        ////////
+        initView();
+        replace(position);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Account account = AppDatabase.getInstance(MainActivity.this).accountDao().getCurrent();
+        initHeader(account);
+        if (account!=null&& TextUtils.isEmpty(account.getLogo())){
+            userViewModel.userInfo(account.getUserId());
+        }
+    }
+
+    private void initView() {
         // Set behavior of Navigation drawer
         navView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -62,7 +98,9 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         // Set item in checked state
                         if (menuItem.getItemId()==R.id.menu_about){
-
+                            AboutActivity.start(MainActivity.this);
+                        }else if (menuItem.getItemId()==R.id.menu_setting){
+                            SettingActivity.start(MainActivity.this);
                         }else {
                             menuItem.setChecked(true);
                             toolbar.setTitle(menuItem.getTitle());
@@ -82,25 +120,38 @@ public class MainActivity extends AppCompatActivity {
                             }
                             replace(position);
                             invalidateOptionsMenu();
+                            // Closing drawer on item click
+                            drawer.closeDrawers();
                         }
-                        // Closing drawer on item click
-                        drawer.closeDrawers();
+
                         return true;
                     }
                 });
+        navView.getHeaderView(0).findViewById(R.id.user_img).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginActivity.start(MainActivity.this);
+            }
+        });
         // Adding Floating Action Button to bottom right of main view
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(v, "Hello Snackbar!",
-                        Snackbar.LENGTH_LONG).show();
+                //Snackbar.make(v, "Hello Snackbar!",Snackbar.LENGTH_LONG).show();
+                NoteEditorActivity.start(MainActivity.this);
             }
         });
         fragmentList.add(RecentNoteFragment.newInstance());
         fragmentList.add(RecentNoteFragment.newInstance());
         fragmentList.add(RecentNoteFragment.newInstance());
         fragmentList.add(RecentNoteFragment.newInstance());
-        replace(position);
+
+        userViewModel.userInfoResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                userInfoResponse(response);
+            }
+        });
     }
 
     private void replace(int position){
@@ -152,4 +203,37 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    private void userInfoResponse(Response response){
+        switch (response.status) {
+            case LOADING:
+                break;
+            case SUCCESS:
+                Account account = (Account) response.data;
+                initHeader(account);
+                break;
+            case ERROR:
+                Throwable e = response.error;
+                e.printStackTrace();
+                break;
+        }
+    }
+
+    private void initHeader(Account account){
+        View headerView = navView.getHeaderView(0);
+        ImageView userImg = headerView.findViewById(R.id.user_img);
+        TextView userName = headerView.findViewById(R.id.user_name);
+        TextView userEmail = headerView.findViewById(R.id.user_email);
+        if (account==null){
+            userName.setText("点击登录");
+            userEmail.setVisibility(View.INVISIBLE);
+        }else {
+            userName.setText(account.getUsername());
+            userEmail.setText(account.getEmail());
+            userEmail.setVisibility(View.VISIBLE);
+        }
+
+    }
+
 }

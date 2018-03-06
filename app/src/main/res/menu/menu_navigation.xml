@@ -38,6 +38,11 @@
             android:title="标签" />
     </group>
     <item
+        android:id="@+id/menu_setting"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:tint="@color/button_grey"
+        android:title="设置" />
+    <item
         android:id="@+id/menu_about"
         android:icon="@drawable/ic_info"
         android:tint="@color/button_grey"

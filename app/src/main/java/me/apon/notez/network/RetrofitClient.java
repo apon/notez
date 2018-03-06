@@ -7,6 +7,11 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import me.apon.notez.BuildConfig;
+import me.apon.notez.app.NoteApp;
+import me.apon.notez.data.database.AppDatabase;
+import me.apon.notez.data.model.Account;
+import me.apon.notez.data.model.Note;
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -54,7 +59,18 @@ public class RetrofitClient {
                         .newBuilder()
                         .addHeader("Connection","close")
                         .build();
-                return chain.proceed(request);
+                HttpUrl url = request.url();
+                HttpUrl newUrl = url;
+                Account account = AppDatabase.getInstance(NoteApp.app).accountDao().getCurrent();
+                if (account!=null) {
+                    newUrl = url.newBuilder()
+                            .addQueryParameter("token", account.getToken())
+                            .build();
+                }
+                Request newRequest = request.newBuilder()
+                        .url(newUrl)
+                        .build();
+                return chain.proceed(newRequest);
             }
         });
         /**

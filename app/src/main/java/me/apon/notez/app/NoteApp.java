@@ -19,6 +19,8 @@ import me.apon.notez.BuildConfig;
 
 public class NoteApp extends Application{
 
+    public static NoteApp app;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -29,6 +31,7 @@ public class NoteApp extends Application{
         if (BuildConfig.DEBUG){
             LeakCanary.install(this);
         }
+        app = this;
         //Logger.addLogAdapter(new AndroidLogAdapter());
     }
 }
