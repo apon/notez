@@ -41,9 +41,9 @@ public class RetrofitClient {
     public static OkHttpClient.Builder getBuilder(){
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        if (BuildConfig.DEBUG){//Stetho
+        //if (BuildConfig.DEBUG){//Stetho
             builder.addNetworkInterceptor(new StethoInterceptor());
-        }
+        //}
         /**
          * Log信息拦截器
          */

@@ -16,12 +16,32 @@ public class Account {
     @PrimaryKey(autoGenerate = true)
     Long id;
 
+    int noteUsn;
+    int notebookUsn;
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+
+    public int getNoteUsn() {
+        return noteUsn;
+    }
+
+    public void setNoteUsn(int noteUsn) {
+        this.noteUsn = noteUsn;
+    }
+
+    public int getNotebookUsn() {
+        return notebookUsn;
+    }
+
+    public void setNotebookUsn(int notebookUsn) {
+        this.notebookUsn = notebookUsn;
     }
 
     /**

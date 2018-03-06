@@ -1,6 +1,8 @@
 package me.apon.notez.data.model;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
@@ -20,6 +22,7 @@ public class Note {
     String userId;
     @SerializedName("Title")
     String title;
+    @Ignore
     @SerializedName("Tags")
     List<String> tags;
     @SerializedName("Content")
@@ -30,6 +33,7 @@ public class Note {
     boolean isBlog;
     @SerializedName("IsTrash")
     boolean isTrash;
+    @Ignore
     @SerializedName("Files")
     List<NoteFile> files; // 图片, 附件
     @SerializedName("CreatedTime")
@@ -46,12 +50,68 @@ public class Note {
     @PrimaryKey(autoGenerate = true)
     Long id;
 
+
+    String desc = "";
+    String noteAbstract = "";
+    String fileIds;
+    boolean isDirty;
+    boolean isUploading;
+    String tagStr = "";
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getNoteAbstract() {
+        return noteAbstract;
+    }
+
+    public void setNoteAbstract(String noteAbstract) {
+        this.noteAbstract = noteAbstract;
+    }
+
+    public String getFileIds() {
+        return fileIds;
+    }
+
+    public void setFileIds(String fileIds) {
+        this.fileIds = fileIds;
+    }
+
+    public boolean isDirty() {
+        return isDirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        isDirty = dirty;
+    }
+
+    public boolean isUploading() {
+        return isUploading;
+    }
+
+    public void setUploading(boolean uploading) {
+        isUploading = uploading;
+    }
+
+    public String getTagStr() {
+        return tagStr;
+    }
+
+    public void setTagStr(String tagStr) {
+        this.tagStr = tagStr;
     }
 
     public String getNoteId() {

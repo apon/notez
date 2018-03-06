@@ -1,4 +1,4 @@
-package me.apon.notez;
+package me.apon.notez.features.home;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -16,6 +16,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,12 +28,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.apon.notez.R;
 import me.apon.notez.data.database.AppDatabase;
 import me.apon.notez.data.database.dao.AccountDao;
 import me.apon.notez.data.model.Account;
+import me.apon.notez.data.model.Notebook;
 import me.apon.notez.data.model.Response;
-import me.apon.notez.features.home.AboutActivity;
-import me.apon.notez.features.home.RecentNoteFragment;
 import me.apon.notez.features.note.NoteEditorActivity;
 import me.apon.notez.features.user.LoginActivity;
 import me.apon.notez.features.user.SettingActivity;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     List<Fragment> fragmentList = new ArrayList<>();
 
     UserViewModel userViewModel;
+    MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         AccountDao accountDao = AppDatabase.getInstance(this).accountDao();
 
         userViewModel = ViewModelProviders.of(this,new UserViewModelFactory(accountDao)).get(UserViewModel.class);
+        mainViewModel = ViewModelProviders.of(this,new MainViewModelFactory(AppDatabase.getInstance(this))).get(MainViewModel.class);
         ////////
         initView();
         replace(position);
@@ -87,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
         if (account!=null&& TextUtils.isEmpty(account.getLogo())){
             userViewModel.userInfo(account.getUserId());
         }
+        //mainViewModel.getNoteBooks();
+        mainViewModel.getSyncNotebooks();
+        //mainViewModel.getNotes();
     }
 
     private void initView() {
@@ -152,6 +158,20 @@ public class MainActivity extends AppCompatActivity {
                 userInfoResponse(response);
             }
         });
+
+        mainViewModel.noteBooksResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                noteBooksResponse(response);
+            }
+        });
+
+        mainViewModel.syncNotebooksResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                syncNotebooks(response);
+            }
+        });
     }
 
     private void replace(int position){
@@ -204,6 +224,43 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    private void noteBooksResponse(Response response){
+        switch (response.status) {
+            case LOADING:
+                break;
+            case SUCCESS:
+                List<Notebook> notebooks = (List<Notebook>) response.data;
+                if (notebooks.size()==2){
+                    mainViewModel.getNoteBooks();
+                }
+                break;
+            case ERROR:
+                Throwable e = response.error;
+                e.printStackTrace();
+                break;
+        }
+    }
+
+    private void syncNotebooks(Response response){
+        switch (response.status) {
+            case LOADING:
+                break;
+            case SUCCESS:
+                List<Notebook> notebooks = (List<Notebook>) response.data;
+                if (notebooks.size()==2){
+                    mainViewModel.getSyncNotebooks();//从网络同步
+                }else {
+                    Log.d("MainActivit","======同步完成！======");
+                    mainViewModel.getNoteBooks();//从本地数据库获取
+                }
+                break;
+            case ERROR:
+                Throwable e = response.error;
+                e.printStackTrace();
+                break;
+        }
+    }
 
     private void userInfoResponse(Response response){
         switch (response.status) {

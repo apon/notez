@@ -2,6 +2,7 @@ package me.apon.notez.data.database.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import me.apon.notez.data.model.Note;
 @Dao
 public interface NoteDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void Insert(Note note);
 
     @Query("select * from notes where userId = :userid and title like :keyword")
@@ -30,7 +31,7 @@ public interface NoteDao {
     @Query("select * from notes where userId = :userId")
     Single<List<Note>> getAllNotes(String userId);
 
-    @Query("select * from notes where userId = :userId and isTrash = true")
+    @Query("select * from notes where userId = :userId and isTrash = 'true'")
     Single<List<Note>> getAllDirtyNotes(String userId);
 
     @Query("delete from notes where userId = :userId")

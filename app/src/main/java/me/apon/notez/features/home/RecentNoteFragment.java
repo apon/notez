@@ -1,15 +1,24 @@
 package me.apon.notez.features.home;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import me.apon.notez.R;
 import me.apon.notez.app.BaseFragment;
+import me.apon.notez.data.database.AppDatabase;
+import me.apon.notez.data.model.Notebook;
+import me.apon.notez.data.model.Response;
+import me.apon.notez.utils.ExceptionMsgUtil;
 
 /**
  * 在此写用途
@@ -21,6 +30,10 @@ import me.apon.notez.app.BaseFragment;
  */
 
 public class RecentNoteFragment extends BaseFragment {
+
+    public static final String TAG = "RecentNoteFragment";
+
+    MainViewModel mainViewModel;
 
     public static RecentNoteFragment newInstance() {
 
@@ -47,10 +60,35 @@ public class RecentNoteFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mainViewModel = ViewModelProviders.of(getActivity(),new MainViewModelFactory(AppDatabase.getInstance(getActivity()))).get(MainViewModel.class);
+
         initView();
     }
 
     private void initView() {
+        mainViewModel.noteBooksResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                noteBooksResponse(response);
+            }
+        });
+    }
 
+    private void noteBooksResponse(Response response){
+        switch (response.status) {
+            case LOADING:
+                Log.d(TAG,"=======LOADING=========");
+                break;
+            case SUCCESS:
+                List<Notebook> notebooks = (List<Notebook>) response.data;
+                Log.d(TAG,"=======SUCCESS========="+notebooks.size());
+
+                break;
+            case ERROR:
+                Log.d(TAG,"=======ERROR=========");
+                Throwable e = response.error;
+                e.printStackTrace();
+                break;
+        }
     }
 }

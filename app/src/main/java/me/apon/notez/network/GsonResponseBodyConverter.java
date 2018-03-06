@@ -39,10 +39,11 @@ public class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> 
     @Override
     public T convert(ResponseBody value) throws IOException {
         String response = value.string();
-
-        BaseResponse baseResponse = gson.fromJson(response, BaseResponse.class);
-        if (!baseResponse.isOk()){
-            throw new ApiException(false,baseResponse.getMsg());
+        if(gson.toJsonTree(response).isJsonObject()){
+            BaseResponse baseResponse = gson.fromJson(response, BaseResponse.class);
+            if (!baseResponse.isOk()){
+                throw new ApiException(false,baseResponse.getMsg());
+            }
         }
 
         MediaType contentType = value.contentType();

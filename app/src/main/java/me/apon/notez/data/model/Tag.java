@@ -1,12 +1,27 @@
 package me.apon.notez.data.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by yaopeng(aponone@gmail.com) on 2018/1/26.
  */
 
+@Entity(tableName = "tags")
 public class Tag {
+    @PrimaryKey(autoGenerate = true)
+    long id;
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+
     @SerializedName("TagId")
     String tagId;
     @SerializedName("UserId")

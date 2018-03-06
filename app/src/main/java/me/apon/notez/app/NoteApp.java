@@ -28,9 +28,9 @@ public class NoteApp extends Application{
     }
 
     private void init(){
-        if (BuildConfig.DEBUG){
+        //if (BuildConfig.DEBUG){
             LeakCanary.install(this);
-        }
+        //}
         app = this;
         //Logger.addLogAdapter(new AndroidLogAdapter());
     }
