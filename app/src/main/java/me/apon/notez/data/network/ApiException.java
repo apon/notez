@@ -1,10 +1,10 @@
-package me.apon.notez.network;
+package me.apon.notez.data.network;
 
 /**
  * 在此写用途
  *
  * @version V1.0 <描述当前版本功能>
- * @FileName: me.apon.notez.network.ApiException.java
+ * @FileName: me.apon.notez.data.network.ApiException.java
  * @author: yaopeng(aponone@gmail.com)
  * @date: 2018-01-26
  */

@@ -23,7 +23,6 @@ import me.apon.notez.R;
 import me.apon.notez.app.BaseActivity;
 import me.apon.notez.data.database.AppDatabase;
 import me.apon.notez.data.database.dao.AccountDao;
-import me.apon.notez.data.model.Account;
 import me.apon.notez.data.model.Response;
 import me.apon.notez.utils.ExceptionMsgUtil;
 
@@ -61,7 +60,7 @@ public class LoginActivity extends BaseActivity {
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
             VectorDrawableCompat indicator
-                    = VectorDrawableCompat.create(getResources(), R.drawable.ic_arrow_back_black_24dp, getTheme());
+                    = VectorDrawableCompat.create(getResources(), R.drawable.ic_arrow_back_black, getTheme());
             indicator.setTint(ResourcesCompat.getColor(getResources(), R.color.white, getTheme()));
             supportActionBar.setHomeAsUpIndicator(indicator);
             supportActionBar.setDisplayHomeAsUpEnabled(true);

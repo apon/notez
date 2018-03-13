@@ -23,13 +23,16 @@ public interface NoteDao {
     Single<List<Note>> searchByTitle(String userid,String keyword);
 
     @Query("select * from notes where noteId = :serverId")
-    Single<Note> getByServerId(String serverId);
+    Note getByServerId(String serverId);
+
+    @Query("select * from notes where noteId = :serverId")
+    Single<Note> getByServerIdX(String serverId);
 
     @Query("select * from notes where id = :localId")
     Single<Note> getByLocalId(long localId);
 
     @Query("select * from notes where userId = :userId")
-    Single<List<Note>> getAllNotes(String userId);
+    Single<List<Note>> getAllNotesX(String userId);
 
     @Query("select * from notes where userId = :userId and isTrash = 'true'")
     Single<List<Note>> getAllDirtyNotes(String userId);

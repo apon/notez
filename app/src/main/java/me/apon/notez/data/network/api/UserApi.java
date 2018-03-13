@@ -1,4 +1,4 @@
-package me.apon.notez.network.api;
+package me.apon.notez.data.network.api;
 
 import io.reactivex.Observable;
 import me.apon.notez.data.model.BaseResponse;

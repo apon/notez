@@ -20,10 +20,10 @@ import me.apon.notez.data.model.Login;
 import me.apon.notez.data.model.Response;
 import me.apon.notez.data.model.SyncState;
 import me.apon.notez.data.model.User;
-import me.apon.notez.network.NConsumer;
-import me.apon.notez.network.NObserver;
-import me.apon.notez.network.RetrofitClient;
-import me.apon.notez.network.api.UserApi;
+import me.apon.notez.data.network.NConsumer;
+import me.apon.notez.data.network.NObserver;
+import me.apon.notez.data.network.RetrofitClient;
+import me.apon.notez.data.network.api.UserApi;
 
 /**
  * Created by yaopeng(aponone@gmail.com) on 2018/1/26.

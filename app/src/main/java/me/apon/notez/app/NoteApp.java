@@ -2,6 +2,7 @@ package me.apon.notez.app;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.Logger;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -28,9 +29,10 @@ public class NoteApp extends Application{
     }
 
     private void init(){
-        //if (BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG){
             LeakCanary.install(this);
-        //}
+            Stetho.initializeWithDefaults(this);
+        }
         app = this;
         //Logger.addLogAdapter(new AndroidLogAdapter());
     }

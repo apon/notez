@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:passwordToggleContentDescription="描述"
-        app:passwordToggleDrawable="@drawable/ic_remove_red_eye_black_24dp"
+        app:passwordToggleDrawable="@drawable/ic_remove_red_eye_black"
         app:passwordToggleEnabled="true"
         app:passwordToggleTint="@color/button_grey">
 

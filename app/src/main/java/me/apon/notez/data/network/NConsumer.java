@@ -1,4 +1,4 @@
-package me.apon.notez.network;
+package me.apon.notez.data.network;
 
 import android.arch.lifecycle.MutableLiveData;
 

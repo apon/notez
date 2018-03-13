@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ import me.apon.notez.R;
 import me.apon.notez.data.database.AppDatabase;
 import me.apon.notez.data.database.dao.AccountDao;
 import me.apon.notez.data.model.Account;
+import me.apon.notez.data.model.Note;
 import me.apon.notez.data.model.Notebook;
 import me.apon.notez.data.model.Response;
 import me.apon.notez.features.note.NoteEditorActivity;
@@ -91,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
             userViewModel.userInfo(account.getUserId());
         }
         //mainViewModel.getNoteBooks();
-        mainViewModel.getSyncNotebooks();
+        mainViewModel.getSyncNotebooks();//同步笔记本
+        mainViewModel.getSyncNotes();//同步笔记
         //mainViewModel.getNotes();
     }
 
@@ -172,6 +175,19 @@ public class MainActivity extends AppCompatActivity {
                 syncNotebooks(response);
             }
         });
+
+        mainViewModel.syncNotesResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                syncNotesResponse(response);
+            }
+        });
+        mainViewModel.notesResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                notesResponse(response);
+            }
+        });
     }
 
     private void replace(int position){
@@ -195,14 +211,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
+        menu.add(0, 500, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_search).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         if (position==0){
             menu.add(0, 100, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_home).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }else if (position==1){
-            menu.add(0, 101, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_book).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            menu.add(0, 200, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_book).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }else if (position==2){
-            menu.add(0, 102, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_list).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            menu.add(0, 300, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_list).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }else if (position==3){
-            menu.add(0, 103, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_loyalty_white).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            menu.add(0, 400, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_loyalty_white).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -221,6 +238,24 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == android.R.id.home) {
             drawer.openDrawer(GravityCompat.START);
         }
+        switch (id){
+            case 100:
+                Toast.makeText(this, "首页", Toast.LENGTH_SHORT).show();
+                break;
+            case 200:
+                Toast.makeText(this, "笔记", Toast.LENGTH_SHORT).show();
+                break;
+            case 300:
+                Toast.makeText(this, "分类", Toast.LENGTH_SHORT).show();
+                break;
+            case 400:
+                Toast.makeText(this, "标签", Toast.LENGTH_SHORT).show();
+                break;
+            case 500:
+                Toast.makeText(this, "搜索", Toast.LENGTH_SHORT).show();
+                break;
+
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -231,9 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case SUCCESS:
                 List<Notebook> notebooks = (List<Notebook>) response.data;
-                if (notebooks.size()==2){
-                    mainViewModel.getNoteBooks();
-                }
+                Log.d("MainActivit","======笔记本从本地数据库获取======"+notebooks.size());
                 break;
             case ERROR:
                 Throwable e = response.error;
@@ -251,9 +284,44 @@ public class MainActivity extends AppCompatActivity {
                 if (notebooks.size()==2){
                     mainViewModel.getSyncNotebooks();//从网络同步
                 }else {
-                    Log.d("MainActivit","======同步完成！======");
+                    Log.d("MainActivit","======笔记本同步完成！======");
                     mainViewModel.getNoteBooks();//从本地数据库获取
                 }
+                break;
+            case ERROR:
+                Throwable e = response.error;
+                e.printStackTrace();
+                break;
+        }
+    }
+
+    private void syncNotesResponse(Response response){
+        switch (response.status) {
+            case LOADING:
+                break;
+            case SUCCESS:
+                List<Note> notes = (List<Note>) response.data;
+                if (notes.size()==20){
+                    mainViewModel.getSyncNotes();//从网络同步
+                }else {
+                    Log.d("MainActivit","======笔记同步完成！======");
+                    mainViewModel.getNotes();//从本地数据库获取
+                }
+                break;
+            case ERROR:
+                Throwable e = response.error;
+                e.printStackTrace();
+                break;
+        }
+    }
+
+    private void notesResponse(Response response){
+        switch (response.status) {
+            case LOADING:
+                break;
+            case SUCCESS:
+                List<Note> notebooks = (List<Note>) response.data;
+                Log.d("MainActivit","======笔记从本地数据库获取======"+notebooks.size());
                 break;
             case ERROR:
                 Throwable e = response.error;

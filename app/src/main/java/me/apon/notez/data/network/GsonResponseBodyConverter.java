@@ -1,4 +1,4 @@
-package me.apon.notez.network;
+package me.apon.notez.data.network;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -22,7 +22,7 @@ import static okhttp3.internal.Util.UTF_8;
  * 在此写用途
  *
  * @version V1.0 <描述当前版本功能>
- * @FileName: me.apon.notez.network.GsonResponseBodyConverter.java
+ * @FileName: me.apon.notez.data.network.GsonResponseBodyConverter.java
  * @author: yaopeng(aponone@gmail.com)
  * @date: 2018-01-26
  */

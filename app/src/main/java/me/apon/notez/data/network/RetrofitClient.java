@@ -1,4 +1,4 @@
-package me.apon.notez.network;
+package me.apon.notez.data.network;
 
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
@@ -10,7 +10,6 @@ import me.apon.notez.BuildConfig;
 import me.apon.notez.app.NoteApp;
 import me.apon.notez.data.database.AppDatabase;
 import me.apon.notez.data.model.Account;
-import me.apon.notez.data.model.Note;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -24,7 +23,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
  * 在此写用途
  *
  * @version V1.0 <描述当前版本功能>
- * @FileName: me.apon.notez.network.RetrofitClient.java
+ * @FileName: me.apon.notez.data.network.RetrofitClient.java
  * @author: yaopeng(aponone@gmail.com)
  * @date: 2018-01-26
  */
@@ -41,9 +40,9 @@ public class RetrofitClient {
     public static OkHttpClient.Builder getBuilder(){
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        //if (BuildConfig.DEBUG){//Stetho
+        if (BuildConfig.DEBUG){//Stetho
             builder.addNetworkInterceptor(new StethoInterceptor());
-        //}
+        }
         /**
          * Log信息拦截器
          */

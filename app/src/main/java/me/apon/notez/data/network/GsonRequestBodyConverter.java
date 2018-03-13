@@ -1,4 +1,4 @@
-package me.apon.notez.network;
+package me.apon.notez.data.network;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -18,7 +18,7 @@ import retrofit2.Converter;
  * 在此写用途
  *
  * @version V1.0 <描述当前版本功能>
- * @FileName: me.apon.notez.network.GsonRequestBodyConverter.java
+ * @FileName: me.apon.notez.data.network.GsonRequestBodyConverter.java
  * @author: yaopeng(aponone@gmail.com)
  * @date: 2018-01-26
  */
