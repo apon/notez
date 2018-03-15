@@ -62,10 +62,10 @@ public class RecentNoteFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         mainViewModel = ViewModelProviders.of(getActivity(),new MainViewModelFactory(AppDatabase.getInstance(getActivity()))).get(MainViewModel.class);
 
-        initView();
+        observeLiveData();
     }
 
-    private void initView() {
+    private void observeLiveData() {
         mainViewModel.noteBooksResponse().observe(this, new Observer<Response>() {
             @Override
             public void onChanged(@Nullable Response response) {

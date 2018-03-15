@@ -2,6 +2,8 @@ package me.apon.notez.features.home;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -12,8 +14,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,6 +41,8 @@ import me.apon.notez.data.model.Note;
 import me.apon.notez.data.model.Notebook;
 import me.apon.notez.data.model.Response;
 import me.apon.notez.features.note.NoteEditorActivity;
+import me.apon.notez.features.note.NoteListFragment;
+import me.apon.notez.features.service.SyncService;
 import me.apon.notez.features.user.LoginActivity;
 import me.apon.notez.features.user.SettingActivity;
 import me.apon.notez.features.user.UserViewModel;
@@ -59,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
     UserViewModel userViewModel;
     MainViewModel mainViewModel;
-
+    SearchView mSearchView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         userViewModel = ViewModelProviders.of(this,new UserViewModelFactory(accountDao)).get(UserViewModel.class);
         mainViewModel = ViewModelProviders.of(this,new MainViewModelFactory(AppDatabase.getInstance(this))).get(MainViewModel.class);
+        observeLiveData();
         ////////
         initView();
         replace(position);
@@ -92,10 +99,12 @@ public class MainActivity extends AppCompatActivity {
         if (account!=null&& TextUtils.isEmpty(account.getLogo())){
             userViewModel.userInfo(account.getUserId());
         }
-        //mainViewModel.getNoteBooks();
-        mainViewModel.getSyncNotebooks();//同步笔记本
-        mainViewModel.getSyncNotes();//同步笔记
-        //mainViewModel.getNotes();
+
+        startService(new Intent(this, SyncService.class));
+        mainViewModel.getNoteBooks();
+        //mainViewModel.getSyncNotebooks();//同步笔记本
+        //mainViewModel.getSyncNotes();//同步笔记
+        mainViewModel.getNotes();
     }
 
     private void initView() {
@@ -150,44 +159,26 @@ public class MainActivity extends AppCompatActivity {
                 NoteEditorActivity.start(MainActivity.this);
             }
         });
-        fragmentList.add(RecentNoteFragment.newInstance());
+        fragmentList.add(NoteListFragment.newInstance());
         fragmentList.add(RecentNoteFragment.newInstance());
         fragmentList.add(RecentNoteFragment.newInstance());
         fragmentList.add(RecentNoteFragment.newInstance());
 
-        userViewModel.userInfoResponse().observe(this, new Observer<Response>() {
+        mSearchView = new SearchView(this);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onChanged(@Nullable Response response) {
-                userInfoResponse(response);
+            public boolean onQueryTextSubmit(String query) {
+                mainViewModel.searchNotes(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mainViewModel.searchNotes(newText);
+                return false;
             }
         });
 
-        mainViewModel.noteBooksResponse().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(@Nullable Response response) {
-                noteBooksResponse(response);
-            }
-        });
-
-        mainViewModel.syncNotebooksResponse().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(@Nullable Response response) {
-                syncNotebooks(response);
-            }
-        });
-
-        mainViewModel.syncNotesResponse().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(@Nullable Response response) {
-                syncNotesResponse(response);
-            }
-        });
-        mainViewModel.notesResponse().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(@Nullable Response response) {
-                notesResponse(response);
-            }
-        });
     }
 
     private void replace(int position){
@@ -211,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
-        menu.add(0, 500, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_search).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0, 500, Menu.NONE, R.string.action_settings).setActionView(mSearchView).setIcon(R.drawable.ic_search).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         if (position==0){
             menu.add(0, 100, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_home).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }else if (position==1){
@@ -259,6 +250,67 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void observeLiveData(){
+        userViewModel.userInfoResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                userInfoResponse(response);
+            }
+        });
+
+        mainViewModel.noteBooksResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                noteBooksResponse(response);
+            }
+        });
+        mainViewModel.notesResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                notesResponse(response);
+            }
+        });
+        mainViewModel.noteSearchResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(@Nullable Response response) {
+                noteSearchResponse(response);
+            }
+        });
+    }
+
+    private void noteSearchResponse(Response response){
+        switch (response.status) {
+            case LOADING:
+                break;
+            case SUCCESS:
+                Log.d("MainActivit","======noteSearchResponse======");
+                final Cursor cursor = (Cursor) response.data;
+                if (mSearchView.getSuggestionsAdapter() == null) {
+                    mSearchView.setSuggestionsAdapter(new SimpleCursorAdapter(this, R.layout.note_search_item, cursor, new String[]{"title"}, new int[]{R.id.title}));
+                } else {
+                    mSearchView.getSuggestionsAdapter().changeCursor(cursor);
+                }
+                mSearchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+                    @Override
+                    public boolean onSuggestionSelect(int position) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onSuggestionClick(int position) {
+                        cursor.move(position);
+                        String title = cursor.getString(cursor.getColumnIndex("title"));
+                        Toast.makeText(MainActivity.this, ""+title, Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                });
+                break;
+            case ERROR:
+                Throwable e = response.error;
+                e.printStackTrace();
+                break;
+        }
+    }
 
     private void noteBooksResponse(Response response){
         switch (response.status) {
@@ -267,46 +319,6 @@ public class MainActivity extends AppCompatActivity {
             case SUCCESS:
                 List<Notebook> notebooks = (List<Notebook>) response.data;
                 Log.d("MainActivit","======笔记本从本地数据库获取======"+notebooks.size());
-                break;
-            case ERROR:
-                Throwable e = response.error;
-                e.printStackTrace();
-                break;
-        }
-    }
-
-    private void syncNotebooks(Response response){
-        switch (response.status) {
-            case LOADING:
-                break;
-            case SUCCESS:
-                List<Notebook> notebooks = (List<Notebook>) response.data;
-                if (notebooks.size()==2){
-                    mainViewModel.getSyncNotebooks();//从网络同步
-                }else {
-                    Log.d("MainActivit","======笔记本同步完成！======");
-                    mainViewModel.getNoteBooks();//从本地数据库获取
-                }
-                break;
-            case ERROR:
-                Throwable e = response.error;
-                e.printStackTrace();
-                break;
-        }
-    }
-
-    private void syncNotesResponse(Response response){
-        switch (response.status) {
-            case LOADING:
-                break;
-            case SUCCESS:
-                List<Note> notes = (List<Note>) response.data;
-                if (notes.size()==20){
-                    mainViewModel.getSyncNotes();//从网络同步
-                }else {
-                    Log.d("MainActivit","======笔记同步完成！======");
-                    mainViewModel.getNotes();//从本地数据库获取
-                }
                 break;
             case ERROR:
                 Throwable e = response.error;

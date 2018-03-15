@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import me.apon.notez.utils.TimeUtils;
+
 /**
  * Created by yaopeng(aponone@gmail.com) on 2018/1/26.
  */
@@ -57,6 +59,40 @@ public class Note {
     boolean isDirty;
     boolean isUploading;
     String tagStr = "";
+
+    long createdTimeInMills;
+    long updatedTimeInMills;
+    long publicTimeInMills;
+
+    public long getCreatedTimeInMills() {
+        return createdTimeInMills;
+    }
+
+    public void setCreatedTimeInMills(long createdTimeInMills) {
+        this.createdTimeInMills = createdTimeInMills;
+    }
+
+    public long getUpdatedTimeInMills() {
+        return updatedTimeInMills;
+    }
+
+    public void setUpdatedTimeInMills(long updatedTimeInMills) {
+        this.updatedTimeInMills = updatedTimeInMills;
+    }
+
+    public long getPublicTimeInMills() {
+        return publicTimeInMills;
+    }
+
+    public void setPublicTimeInMills(long publicTimeInMills) {
+        this.publicTimeInMills = publicTimeInMills;
+    }
+
+    public void updateTime() {
+        createdTimeInMills = TimeUtils.toTimestamp(createdTime);
+        updatedTimeInMills = TimeUtils.toTimestamp(updatedTime);
+        publicTimeInMills = TimeUtils.toTimestamp(publicTime);
+    }
 
     public Long getId() {
         return id;

@@ -29,6 +29,8 @@
             android:label="编辑"/>
         <activity android:name=".features.user.SettingActivity"
             android:label="设置"/>
+
+        <service android:name=".features.service.SyncService"/>
     </application>
 
 </manifest>

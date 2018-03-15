@@ -6,6 +6,8 @@ import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.Logger;
 import com.squareup.leakcanary.LeakCanary;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import me.apon.notez.BuildConfig;
 
 
@@ -35,5 +37,6 @@ public class NoteApp extends Application{
         }
         app = this;
         //Logger.addLogAdapter(new AndroidLogAdapter());
+        JodaTimeAndroid.init(this);
     }
 }

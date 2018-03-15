@@ -17,7 +17,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public class HttpLogger implements HttpLoggingInterceptor.Logger{
 
-    private StringBuilder mMessage = new StringBuilder();
+    private StringBuffer mMessage = new StringBuffer();
     @Override
     public void log(String message) {
         //Log.d("HTTP",message);

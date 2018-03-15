@@ -73,4 +73,10 @@ dependencies {
 
     //richeditor
     compile 'jp.wasabeef:richeditor-android:1.2.2'
+
+    //AdapterHelper
+    compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
+
+    //Joda-Time
+    compile 'net.danlew:android.joda:2.9.9.2'
 }

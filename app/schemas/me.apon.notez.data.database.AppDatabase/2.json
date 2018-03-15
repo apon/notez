@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "efd08635c18c29442f8e594df8cca200",
+    "identityHash": "43a3b5a5081eaf901ae09d587e32a311",
     "entities": [
       {
         "tableName": "accounts",
@@ -234,7 +234,7 @@
       },
       {
         "tableName": "notes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`noteId` TEXT, `notebookId` TEXT, `userId` TEXT, `title` TEXT, `content` TEXT, `isMarkdown` INTEGER NOT NULL, `isBlog` INTEGER NOT NULL, `isTrash` INTEGER NOT NULL, `createdTime` TEXT, `updatedTime` TEXT, `publicTime` TEXT, `usn` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT, `desc` TEXT, `noteAbstract` TEXT, `fileIds` TEXT, `isDirty` INTEGER NOT NULL, `isUploading` INTEGER NOT NULL, `tagStr` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`noteId` TEXT, `notebookId` TEXT, `userId` TEXT, `title` TEXT, `content` TEXT, `isMarkdown` INTEGER NOT NULL, `isBlog` INTEGER NOT NULL, `isTrash` INTEGER NOT NULL, `createdTime` TEXT, `updatedTime` TEXT, `publicTime` TEXT, `usn` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT, `desc` TEXT, `noteAbstract` TEXT, `fileIds` TEXT, `isDirty` INTEGER NOT NULL, `isUploading` INTEGER NOT NULL, `tagStr` TEXT, `createdTimeInMills` INTEGER NOT NULL, `updatedTimeInMills` INTEGER NOT NULL, `publicTimeInMills` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "noteId",
@@ -349,6 +349,24 @@
             "columnName": "tagStr",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "createdTimeInMills",
+            "columnName": "createdTimeInMills",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedTimeInMills",
+            "columnName": "updatedTimeInMills",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publicTimeInMills",
+            "columnName": "publicTimeInMills",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -363,7 +381,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"efd08635c18c29442f8e594df8cca200\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"43a3b5a5081eaf901ae09d587e32a311\")"
     ]
   }
 }

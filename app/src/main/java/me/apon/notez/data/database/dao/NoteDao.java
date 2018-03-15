@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.database.Cursor;
 
 import java.util.List;
 
@@ -19,8 +20,8 @@ public interface NoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void Insert(Note note);
 
-    @Query("select * from notes where userId = :userid and title like :keyword")
-    Single<List<Note>> searchByTitle(String userid,String keyword);
+    @Query("select id _id , * from notes where userId = :userid and title like '%' || :keyword || '%'")
+    Cursor searchByTitle(String userid, String keyword);
 
     @Query("select * from notes where noteId = :serverId")
     Note getByServerId(String serverId);

@@ -70,10 +70,10 @@ public class LoginActivity extends BaseActivity {
 
         userViewModel = ViewModelProviders.of(this,new UserViewModelFactory(accountDao)).get(UserViewModel.class);
 
-        initView();
+        observeLiveData();
     }
 
-    private void initView() {
+    private void observeLiveData() {
         userViewModel.loginResponse().observe(this, new Observer<Response>() {
             @Override
             public void onChanged(@Nullable Response response) {
