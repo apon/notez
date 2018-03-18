@@ -74,9 +74,8 @@ public class SettingActivity extends BaseActivity {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        AccountDao accountDao = AppDatabase.getInstance(this).accountDao();
 
-        userViewModel = ViewModelProviders.of(this,new UserViewModelFactory(accountDao)).get(UserViewModel.class);
+        userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
         observeLiveData();
     }

@@ -16,6 +16,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import me.apon.notez.app.NoteApp;
 import me.apon.notez.data.database.AppDatabase;
 import me.apon.notez.data.model.Account;
 import me.apon.notez.data.model.Note;
@@ -36,9 +37,9 @@ public class MainViewModel extends ViewModel {
 
     private CompositeDisposable compositeDisposable;
 
-    public MainViewModel(AppDatabase appDatabase) {
+    public MainViewModel() {
         compositeDisposable = new CompositeDisposable();
-        this.appDatabase = appDatabase;
+        this.appDatabase = AppDatabase.getInstance(NoteApp.app);
     }
 
     @Override

@@ -13,10 +13,13 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import me.apon.notez.app.NoteApp;
+import me.apon.notez.data.database.AppDatabase;
 import me.apon.notez.data.database.dao.AccountDao;
 import me.apon.notez.data.model.Account;
 import me.apon.notez.data.model.BaseResponse;
 import me.apon.notez.data.model.Login;
+import me.apon.notez.data.model.Note;
 import me.apon.notez.data.model.Response;
 import me.apon.notez.data.model.SyncState;
 import me.apon.notez.data.model.User;
@@ -35,9 +38,9 @@ public class UserViewModel extends ViewModel {
 
     private CompositeDisposable compositeDisposable;
 
-    public UserViewModel(AccountDao accountDataSource) {
+    public UserViewModel() {
         compositeDisposable = new CompositeDisposable();
-        this.accountDataSource = accountDataSource;
+        this.accountDataSource = AppDatabase.getInstance(NoteApp.app).accountDao();
     }
 
     @Override

@@ -60,7 +60,7 @@ public class RecentNoteFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mainViewModel = ViewModelProviders.of(getActivity(),new MainViewModelFactory(AppDatabase.getInstance(getActivity()))).get(MainViewModel.class);
+        mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 
         observeLiveData();
     }

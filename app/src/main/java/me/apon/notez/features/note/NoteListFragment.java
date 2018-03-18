@@ -10,17 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
+
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.apon.notez.R;
 import me.apon.notez.app.BaseFragment;
-import me.apon.notez.data.database.AppDatabase;
 import me.apon.notez.data.model.Note;
 import me.apon.notez.data.model.Response;
 import me.apon.notez.features.home.MainViewModel;
-import me.apon.notez.features.home.MainViewModelFactory;
 import me.apon.notez.features.note.adapter.NoteListAdapter;
 
 /**
@@ -59,7 +59,7 @@ public class NoteListFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mMainViewModel = ViewModelProviders.of(getActivity(),new MainViewModelFactory(AppDatabase.getInstance(getActivity()))).get(MainViewModel.class);
+        mMainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         observeLiveData();
         initView();
     }
@@ -68,6 +68,13 @@ public class NoteListFragment extends BaseFragment {
         mNoteListAdapter = new NoteListAdapter();
         recyclerView.setAdapter(mNoteListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mNoteListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Note note = (Note) adapter.getItem(position);
+                NotePreviewActivity.start(getActivity(),note.getNoteId());
+            }
+        });
 
     }
 

@@ -35,7 +35,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.apon.notez.R;
 import me.apon.notez.data.database.AppDatabase;
-import me.apon.notez.data.database.dao.AccountDao;
 import me.apon.notez.data.model.Account;
 import me.apon.notez.data.model.Note;
 import me.apon.notez.data.model.Notebook;
@@ -46,7 +45,6 @@ import me.apon.notez.features.service.SyncService;
 import me.apon.notez.features.user.LoginActivity;
 import me.apon.notez.features.user.SettingActivity;
 import me.apon.notez.features.user.UserViewModel;
-import me.apon.notez.features.user.UserViewModelFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,10 +79,9 @@ public class MainActivity extends AppCompatActivity {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
         //////
-        AccountDao accountDao = AppDatabase.getInstance(this).accountDao();
 
-        userViewModel = ViewModelProviders.of(this,new UserViewModelFactory(accountDao)).get(UserViewModel.class);
-        mainViewModel = ViewModelProviders.of(this,new MainViewModelFactory(AppDatabase.getInstance(this))).get(MainViewModel.class);
+        userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         observeLiveData();
         ////////
         initView();
