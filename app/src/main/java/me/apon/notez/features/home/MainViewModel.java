@@ -14,6 +14,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import me.apon.notez.app.NoteApp;
@@ -27,6 +28,7 @@ import me.apon.notez.data.network.NObserver;
 import me.apon.notez.data.network.RetrofitClient;
 import me.apon.notez.data.network.api.NoteApi;
 import me.apon.notez.data.network.api.NotebookApi;
+import me.apon.notez.utils.RxBus;
 
 /**
  * Created by yaopeng(aponone@gmail.com) on 2018/3/6.
@@ -40,6 +42,7 @@ public class MainViewModel extends ViewModel {
     public MainViewModel() {
         compositeDisposable = new CompositeDisposable();
         this.appDatabase = AppDatabase.getInstance(NoteApp.app);
+        initRxBus();
     }
 
     @Override
@@ -47,6 +50,28 @@ public class MainViewModel extends ViewModel {
         super.onCleared();
         compositeDisposable.clear();
     }
+
+    //RxBus
+    private MutableLiveData<Response> rxBusResponse = new MutableLiveData<>();
+
+    public LiveData<Response> rxBusResponse() {
+        return rxBusResponse;
+    }
+
+    private void initRxBus(){
+        compositeDisposable.add(RxBus.getInstance()
+                .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        rxBusResponse.setValue(Response.success(o));
+                    }
+                }));
+
+    }
+
     //从本地获取笔记本数据
     private MutableLiveData<Response> noteBooksResponse = new MutableLiveData<>();
 
@@ -55,7 +80,11 @@ public class MainViewModel extends ViewModel {
     }
 
     public void getNoteBooks(){
-        appDatabase.noteBookDao().getAllNoteBook()
+        Account account = appDatabase.accountDao().getCurrent();
+        if (account==null){
+            return;
+        }
+        appDatabase.noteBookDao().getAllNoteBook(account.getUserId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(new NConsumer(noteBooksResponse,compositeDisposable))
@@ -112,8 +141,33 @@ public class MainViewModel extends ViewModel {
                     }
                 });
     }
+    public void getNotesByBookId(String bookid){
+        Account account = appDatabase.accountDao().getCurrent();
+        if (account==null){
+            return;
+        }
+        appDatabase.noteDao().getByBookIdX(account.getUserId(),bookid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new NConsumer(notesResponse,compositeDisposable))
+                .subscribe(new SingleObserver<List<Note>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
 
-    //从本地获取笔记数据
+                    }
+
+                    @Override
+                    public void onSuccess(@NonNull List<Note> notes) {
+                        notesResponse.setValue(Response.success(notes));
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        notesResponse.setValue(Response.error(e));
+                    }
+                });
+    }
+
     private MutableLiveData<Response> noteSearchResponse = new MutableLiveData<>();
 
     public LiveData<Response> noteSearchResponse() {

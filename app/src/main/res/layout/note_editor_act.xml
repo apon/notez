@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -19,8 +20,175 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
     </android.support.design.widget.AppBarLayout>
-    <jp.wasabeef.richeditor.RichEditor
-        android:id="@+id/rich_editor"
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+
+        >
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+
+            <ImageButton
+                android:id="@+id/action_undo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_undo"
+                />
+
+            <ImageButton
+                android:id="@+id/action_redo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_redo"
+                />
+
+            <ImageButton
+                android:id="@+id/action_bold"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_format_bold"
+                />
+
+
+            <ImageButton
+                android:id="@+id/action_strikethrough"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_format_strikethrough"
+                />
+
+            <ImageButton
+                android:id="@+id/action_underline"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_format_underlined"
+                />
+
+            <ImageButton
+                android:id="@+id/action_heading1"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_h_one"
+                />
+
+            <ImageButton
+                android:id="@+id/action_heading2"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_h_two"
+                />
+
+            <ImageButton
+                android:id="@+id/action_heading3"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_h_three"
+                />
+
+            <ImageButton
+                android:id="@+id/action_heading4"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_h_four"
+                />
+
+            <ImageButton
+                android:id="@+id/action_heading5"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_h_five"
+                />
+
+            <ImageButton
+                android:id="@+id/action_heading6"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_h_six"
+                />
+
+
+            <ImageButton
+                android:id="@+id/action_insert_bullets"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_format_list_bulleted"
+                />
+
+            <ImageButton
+                android:id="@+id/action_insert_numbers"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_format_list_numbered"
+                />
+
+
+
+            <ImageButton
+                android:id="@+id/action_insert_checkbox"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_check_circle"
+                />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+        <EditText
+            android:id="@+id/et_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="标题"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:textSize="16sp"/>
+        <jp.wasabeef.richeditor.RichEditor
+            android:id="@+id/rich_editor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 </LinearLayout>

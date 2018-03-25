@@ -4,24 +4,30 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import me.apon.notez.data.database.AppDatabase;
 import me.apon.notez.data.model.Account;
+import me.apon.notez.data.model.Events;
 import me.apon.notez.data.model.Note;
 import me.apon.notez.data.model.Notebook;
+import me.apon.notez.data.model.SyncEvent;
 import me.apon.notez.data.network.RetrofitClient;
 import me.apon.notez.data.network.api.NoteApi;
 import me.apon.notez.data.network.api.NotebookApi;
+import me.apon.notez.utils.RxBus;
 
 /**
  * Created by yaopeng(aponone@gmail.com) on 2018/3/14.
@@ -96,20 +102,55 @@ public class SyncService extends Service {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Integer>() {
+                .subscribe(new Observer<Integer>() {
                     @Override
-                    public void accept(Integer integer) throws Exception {
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
                         if (integer==20){//循环
                             getSyncNotes();
                         }else{
                             isSyncNotesDone = true;
+                            if (integer>0){
+                                RxBus.getInstance().send(new Events.NoteEvent());
+                            }
                         }
                         Log.d(TAG,"=========SyncNotes size========="+integer);
                         if (isSyncNotebooksDone&&isSyncNotesDone){
                             stopSelf();
                         }
                     }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
                 });
+//                .subscribe(new Consumer<Integer>() {
+//                    @Override
+//                    public void accept(Integer integer) throws Exception {
+//                        if (integer==20){//循环
+//                            getSyncNotes();
+//                        }else{
+//                            isSyncNotesDone = true;
+//                            if (integer>0){
+//                                //RxBus.getInstance().send(new Events.NoteEvent());
+//                            }
+//                        }
+//                        Log.d(TAG,"=========SyncNotes size========="+integer);
+//                        if (isSyncNotebooksDone&&isSyncNotesDone){
+//                            stopSelf();
+//                        }
+//                    }
+//                });
     }
 
     public void getSyncNotebooks(){
@@ -146,21 +187,56 @@ public class SyncService extends Service {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Integer>() {
+                .subscribe(new Observer<Integer>() {
                     @Override
-                    public void accept(Integer integer) throws Exception {
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
                         if (integer==20){
                             getSyncNotebooks();
                         }else {
                             isSyncNotebooksDone = true;
+                            if (integer>0){
+                                RxBus.getInstance().send(new Events.NoteBookEvent());
+                            }
                         }
                         Log.d(TAG,"=========SyncNotebooks size========="+integer);
                         if (isSyncNotebooksDone&&isSyncNotesDone){
                             stopSelf();
                         }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
 
                     }
                 });
+//                .subscribe(new Consumer<Integer>() {
+//                    @Override
+//                    public void accept(Integer integer) throws Exception {
+//                        if (integer==20){
+//                            getSyncNotebooks();
+//                        }else {
+//                            isSyncNotebooksDone = true;
+//                            if (integer>0){
+//                                //RxBus.getInstance().send(new Events.NoteBookEvent());
+//                            }
+//                        }
+//                        Log.d(TAG,"=========SyncNotebooks size========="+integer);
+//                        if (isSyncNotebooksDone&&isSyncNotesDone){
+//                            stopSelf();
+//                        }
+//
+//                    }
+//                });
     }
 
     @Override

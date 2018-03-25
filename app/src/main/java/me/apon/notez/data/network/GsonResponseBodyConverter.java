@@ -1,5 +1,7 @@
 package me.apon.notez.data.network;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -39,7 +41,8 @@ public class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> 
     @Override
     public T convert(ResponseBody value) throws IOException {
         String response = value.string();
-        if(gson.toJsonTree(response).isJsonObject()){
+        T val = adapter.fromJson(response);
+        if(gson.toJsonTree(val).isJsonObject()){
             BaseResponse baseResponse = gson.fromJson(response, BaseResponse.class);
             if (!baseResponse.isOk()){
                 throw new ApiException(false,baseResponse.getMsg());

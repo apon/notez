@@ -20,17 +20,17 @@
             android:id="@+id/menu_home"
             android:icon="@drawable/ic_home"
             android:tint="@color/button_grey"
-            android:title="主页" />
+            android:title="最近笔记" />
         <item
             android:id="@+id/menu_book"
             android:icon="@drawable/ic_book"
             android:tint="@color/button_grey"
-            android:title="笔记" />
+            android:title="笔记本" />
         <item
             android:id="@+id/menu_cat"
-            android:icon="@drawable/ic_list"
+            android:icon="@drawable/ic_drafts"
             android:tint="@color/button_grey"
-            android:title="分类" />
+            android:title="草稿" />
         <item
             android:id="@+id/menu_tag"
             android:icon="@drawable/ic_loyalty"

@@ -22,6 +22,6 @@ public interface NoteBookDao {
     @Query("select * from notebooks where NotebookId = :id limit 1")
     Notebook getByServerId(String id);
 
-    @Query("select * from notebooks")
-    Single<List<Notebook>> getAllNoteBook();
+    @Query("select * from notebooks where userId = :userid")
+    Single<List<Notebook>> getAllNoteBook(String userid);
 }

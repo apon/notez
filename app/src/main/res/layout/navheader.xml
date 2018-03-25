@@ -24,7 +24,7 @@
         android:id="@+id/user_img"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@color/button_grey"
+        android:background="@drawable/avatar"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="50dp"
         android:layout_marginLeft="16dp"

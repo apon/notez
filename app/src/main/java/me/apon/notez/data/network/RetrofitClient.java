@@ -54,10 +54,11 @@ public class RetrofitClient {
         builder.addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
-                Request request = chain.request()
-                        .newBuilder()
-                        .addHeader("Connection","close")
-                        .build();
+//                Request request = chain.request()
+//                        .newBuilder()
+//                        .addHeader("Connection","close")
+//                        .build();
+                Request request = chain.request();
                 HttpUrl url = request.url();
                 HttpUrl newUrl = url;
                 Account account = AppDatabase.getInstance(NoteApp.app).accountDao().getCurrent();

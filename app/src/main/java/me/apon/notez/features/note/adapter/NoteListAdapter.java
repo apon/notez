@@ -1,6 +1,7 @@
 package me.apon.notez.features.note.adapter;
 
 
+import android.text.TextUtils;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -25,8 +26,8 @@ public class NoteListAdapter extends BaseQuickAdapter<Note,BaseViewHolder> {
         TextView tvTitle = helper.getView(R.id.tv_title);
         TextView tvTime = helper.getView(R.id.tv_time);
         //TextView tvBook = helper.getView(R.id.tv_book);
-
-        tvTitle.setText(item.getTitle());
+        String title = TextUtils.isEmpty(item.getTitle())?"未命名":item.getTitle();
+        tvTitle.setText(title);
         tvTime.setText(TimeUtils.toDateFormat(item.getUpdatedTimeInMills()));
         //tvBook.setText(item.getNotebookId());
     }

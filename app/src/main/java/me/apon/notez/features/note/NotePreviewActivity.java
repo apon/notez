@@ -11,9 +11,14 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import br.tiagohm.markdownview.MarkdownView;
+import br.tiagohm.markdownview.css.styles.Github;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.apon.notez.R;
@@ -31,16 +36,20 @@ public class NotePreviewActivity extends BaseActivity {
     Toolbar toolbar;
     @BindView(R.id.appbar)
     AppBarLayout appbar;
-    @BindView(R.id.web_view)
-    WebView webView;
+    @BindView(R.id.md_view)
+    MarkdownView mdView;
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
 
     private String noteServerId;
 
+    private Note note;
+
     private NoteViewModel noteViewModel;
 
-    public static void start(Context context,String noteServerId) {
+    public static void start(Context context, String noteServerId) {
         Intent starter = new Intent(context, NotePreviewActivity.class);
-        starter.putExtra("noteid",noteServerId);
+        starter.putExtra("noteid", noteServerId);
         context.startActivity(starter);
     }
 
@@ -65,19 +74,40 @@ public class NotePreviewActivity extends BaseActivity {
     }
 
     private void initView() {
+        mdView.addStyleSheet(new Github());
         noteServerId = getIntent().getStringExtra("noteid");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         noteViewModel.getNoteAndContent(noteServerId);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_preview, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             finish();
         }
+        if (id == R.id.action_edit && note != null && !TextUtils.isEmpty(note.getNoteId())) {
+            if (note.isMarkdown()) {
+                Toast.makeText(this, "暂不支持Markdown编辑", Toast.LENGTH_SHORT).show();
+            } else {
+                NoteEditorActivity.start(this, note.getNoteId());
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
-    private void observeLiveData(){
+    private void observeLiveData() {
         noteViewModel.noteAndContentResponse().observe(this, new Observer<Response>() {
             @Override
             public void onChanged(@Nullable Response response) {
@@ -86,13 +116,18 @@ public class NotePreviewActivity extends BaseActivity {
         });
     }
 
-    private void noteAndContentResponse(Response response){
+    private void noteAndContentResponse(Response response) {
         switch (response.status) {
             case LOADING:
                 break;
             case SUCCESS:
-                Note note = (Note) response.data;
-                webView.loadData(note.getContent(),"text/html;charset=UTF-8", null);
+                note = (Note) response.data;
+                tvTitle.setText(TextUtils.isEmpty(note.getTitle())?"未命名":note.getTitle());
+                if (note.isMarkdown()) {
+                    mdView.loadMarkdown(note.getContent());
+                } else {
+                    mdView.loadData(note.getContent(), "text/html;charset=UTF-8", null);
+                }
                 break;
             case ERROR:
                 Throwable e = response.error;

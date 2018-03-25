@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBar;
@@ -39,8 +40,10 @@ import me.apon.notez.data.model.Account;
 import me.apon.notez.data.model.Note;
 import me.apon.notez.data.model.Notebook;
 import me.apon.notez.data.model.Response;
+import me.apon.notez.features.note.NoteCategoryFragment;
 import me.apon.notez.features.note.NoteEditorActivity;
 import me.apon.notez.features.note.NoteListFragment;
+import me.apon.notez.features.note.NotePreviewActivity;
 import me.apon.notez.features.service.SyncService;
 import me.apon.notez.features.user.LoginActivity;
 import me.apon.notez.features.user.SettingActivity;
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     UserViewModel userViewModel;
     MainViewModel mainViewModel;
     SearchView mSearchView;
+    Account account;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,17 +95,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Account account = AppDatabase.getInstance(MainActivity.this).accountDao().getCurrent();
+        account = AppDatabase.getInstance(MainActivity.this).accountDao().getCurrent();
         initHeader(account);
         if (account!=null&& TextUtils.isEmpty(account.getLogo())){
             userViewModel.userInfo(account.getUserId());
         }
 
         startService(new Intent(this, SyncService.class));
-        mainViewModel.getNoteBooks();
-        //mainViewModel.getSyncNotebooks();//同步笔记本
-        //mainViewModel.getSyncNotes();//同步笔记
-        mainViewModel.getNotes();
     }
 
     private void initView() {
@@ -119,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
                         }else {
                             menuItem.setChecked(true);
                             toolbar.setTitle(menuItem.getTitle());
+
+                            // Closing drawer on item click
+                            drawer.closeDrawers();
                             switch (menuItem.getItemId()){
                                 case R.id.menu_home:
                                     position = 0;
@@ -135,46 +138,33 @@ public class MainActivity extends AppCompatActivity {
                             }
                             replace(position);
                             invalidateOptionsMenu();
-                            // Closing drawer on item click
-                            drawer.closeDrawers();
                         }
 
                         return true;
                     }
                 });
-        navView.getHeaderView(0).findViewById(R.id.user_img).setOnClickListener(new View.OnClickListener() {
+        navView.getHeaderView(0).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LoginActivity.start(MainActivity.this);
+                if (account==null){
+                    LoginActivity.start(MainActivity.this);
+                }
             }
         });
         // Adding Floating Action Button to bottom right of main view
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Snackbar.make(v, "Hello Snackbar!",Snackbar.LENGTH_LONG).show();
                 NoteEditorActivity.start(MainActivity.this);
             }
         });
-        fragmentList.add(NoteListFragment.newInstance());
-        fragmentList.add(RecentNoteFragment.newInstance());
+        fab.setImageResource(R.drawable.ic_mode_edit);
+        fragmentList.add(NoteListFragment.newInstance(null));
+        fragmentList.add(NoteCategoryFragment.newInstance());
         fragmentList.add(RecentNoteFragment.newInstance());
         fragmentList.add(RecentNoteFragment.newInstance());
 
-        mSearchView = new SearchView(this);
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mainViewModel.searchNotes(query);
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mainViewModel.searchNotes(newText);
-                return false;
-            }
-        });
 
     }
 
@@ -190,28 +180,30 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }*/
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.clear();
-        menu.add(0, 500, Menu.NONE, R.string.action_settings).setActionView(mSearchView).setIcon(R.drawable.ic_search).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        if (position==0){
-            menu.add(0, 100, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_home).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }else if (position==1){
-            menu.add(0, 200, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_book).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }else if (position==2){
-            menu.add(0, 300, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_list).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }else if (position==3){
-            menu.add(0, 400, Menu.NONE, R.string.action_settings).setIcon(R.drawable.ic_loyalty_white).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }
+        MenuItem searchItem = menu.findItem(R.id.search_view);
+        //通过MenuItem得到SearchView
+        mSearchView = (SearchView) searchItem.getActionView();
+        //mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mainViewModel.searchNotes(query);
+                return false;
+            }
 
-        return super.onPrepareOptionsMenu(menu);
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mainViewModel.searchNotes(newText);
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
+
 
 
     @Override
@@ -226,24 +218,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == android.R.id.home) {
             drawer.openDrawer(GravityCompat.START);
         }
-        switch (id){
-            case 100:
-                Toast.makeText(this, "首页", Toast.LENGTH_SHORT).show();
-                break;
-            case 200:
-                Toast.makeText(this, "笔记", Toast.LENGTH_SHORT).show();
-                break;
-            case 300:
-                Toast.makeText(this, "分类", Toast.LENGTH_SHORT).show();
-                break;
-            case 400:
-                Toast.makeText(this, "标签", Toast.LENGTH_SHORT).show();
-                break;
-            case 500:
-                Toast.makeText(this, "搜索", Toast.LENGTH_SHORT).show();
-                break;
 
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -255,18 +230,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mainViewModel.noteBooksResponse().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(@Nullable Response response) {
-                noteBooksResponse(response);
-            }
-        });
-        mainViewModel.notesResponse().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(@Nullable Response response) {
-                notesResponse(response);
-            }
-        });
         mainViewModel.noteSearchResponse().observe(this, new Observer<Response>() {
             @Override
             public void onChanged(@Nullable Response response) {
@@ -296,8 +259,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onSuggestionClick(int position) {
                         cursor.move(position);
-                        String title = cursor.getString(cursor.getColumnIndex("title"));
-                        Toast.makeText(MainActivity.this, ""+title, Toast.LENGTH_SHORT).show();
+                        int index = cursor.getColumnIndex("noteId");
+                        String noteId = cursor.getString(index);
+                        NotePreviewActivity.start(MainActivity.this,noteId);
                         return false;
                     }
                 });
@@ -309,35 +273,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void noteBooksResponse(Response response){
-        switch (response.status) {
-            case LOADING:
-                break;
-            case SUCCESS:
-                List<Notebook> notebooks = (List<Notebook>) response.data;
-                Log.d("MainActivit","======笔记本从本地数据库获取======"+notebooks.size());
-                break;
-            case ERROR:
-                Throwable e = response.error;
-                e.printStackTrace();
-                break;
-        }
-    }
-
-    private void notesResponse(Response response){
-        switch (response.status) {
-            case LOADING:
-                break;
-            case SUCCESS:
-                List<Note> notebooks = (List<Note>) response.data;
-                Log.d("MainActivit","======笔记从本地数据库获取======"+notebooks.size());
-                break;
-            case ERROR:
-                Throwable e = response.error;
-                e.printStackTrace();
-                break;
-        }
-    }
 
     private void userInfoResponse(Response response){
         switch (response.status) {

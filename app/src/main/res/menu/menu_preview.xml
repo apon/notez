@@ -18,9 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".features.home.MainActivity">
     <item
-        android:id="@+id/search_view"
-        android:title="搜索"
-        app:actionViewClass="android.support.v7.widget.SearchView"
+        android:id="@+id/action_edit"
+        android:title="编辑"
         app:showAsAction="always"/>
-
 </menu>

@@ -29,10 +29,13 @@ public interface NoteDao {
     @Query("select * from notes where noteId = :serverId")
     Single<Note> getByServerIdX(String serverId);
 
+    @Query("select * from notes where userId = :userId and notebookId = :bookId order by updatedTimeInMills desc")
+    Single<List<Note>> getByBookIdX(String userId,String bookId);
+
     @Query("select * from notes where id = :localId")
     Single<Note> getByLocalId(long localId);
 
-    @Query("select * from notes where userId = :userId")
+    @Query("select * from notes where userId = :userId order by updatedTimeInMills desc" )
     Single<List<Note>> getAllNotesX(String userId);
 
     @Query("select * from notes where userId = :userId and isTrash = 'true'")
