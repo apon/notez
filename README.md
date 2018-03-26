@@ -13,9 +13,9 @@ Notez现在使用自建服务器: [http://note.apon.me](http://note.apon.me)，�
 ![](./screenshots/projectstructure.png)
 
 
-# 如何基于Android架构组件(LiveData+ViewModel)构建MVVM模式？
 
-* 什么是MVVM架构模式？
+
+# 什么是MVVM架构模式？
 
 MVVM模式是Model-View-ViewMode模式的简称。由视图(View)、视图模型(ViewModel)、模型(Model)三部分组成，它们的职责分别是：
 
@@ -25,10 +25,8 @@ MVVM模式是Model-View-ViewMode模式的简称。由视图(View)、视图模型
 3. Model层最大的特点是被赋予了数据获取的职责。实例中，数据的获取、存储都是Model层的任务。Model包括实体模型（Bean）、Retrofit的Service ，RoomDatabase，获取网络数据接口([api包](https://github.com/apon/note/tree/master/app/src/main/java/me/apon/notez/data/network/api))，本地存储（增删改查）接口（[dao包](https://github.com/apon/note/tree/master/app/src/main/java/me/apon/notez/data/database/dao)）。
 ![](./screenshots/mvvm1.png)
 
-* MVVM模式中各层如何协作？
-上图反应了MVVM架构模式中各层间的关系。View和ViewModel、ViewModel和Model间是如何协作的，下面以登录过程为例进行说明。
+上图反应了MVVM架构模式中各层间的关系。下面以登录为例进行说明各层的调用关系。
 
-A. View和ViewModel
 
 
 第一步，LoginActivity(View)获取UserViewModel实例。
@@ -76,12 +74,11 @@ userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 ```
 userViewModel.Login(email, pwd);
 ```
-总结
+
 LoginActivity调用UserViewModel中的方法发起登录请求，请求返回的数据通过LiveData返回给LoginActivity。
 
-B. ViewModel和Model
 
-UserViewModel发起登录请求
+第四部，UserViewModel发起登录请求
 
 
 ```
@@ -110,8 +107,10 @@ UserViewModel发起登录请求
 ```
 
 
-UserViewModel订阅Retrofit的Observable根据不同的状态设置LiveData。
+UserViewModel订阅Retrofit的Observable根据不同的状态设置LiveData。LiveData会触发UI更改（如弹出登录提示）
 
+# 如何基于Android架构组件(LiveData+ViewModel)构建MVVM模式？
+TODO :)
 
 # 应用截图
 
