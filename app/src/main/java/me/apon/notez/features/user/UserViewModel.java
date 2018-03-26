@@ -1,5 +1,7 @@
 package me.apon.notez.features.user;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
@@ -32,15 +34,16 @@ import me.apon.notez.data.network.api.UserApi;
  * Created by yaopeng(aponone@gmail.com) on 2018/1/26.
  */
 
-public class UserViewModel extends ViewModel {
+public class UserViewModel extends AndroidViewModel {
 
     private AccountDao accountDataSource;
 
     private CompositeDisposable compositeDisposable;
 
-    public UserViewModel() {
+    public UserViewModel(Application application) {
+        super(application);
         compositeDisposable = new CompositeDisposable();
-        this.accountDataSource = AppDatabase.getInstance(NoteApp.app).accountDao();
+        this.accountDataSource = AppDatabase.getInstance(application).accountDao();
     }
 
     @Override

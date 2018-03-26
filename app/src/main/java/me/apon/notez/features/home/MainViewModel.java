@@ -1,5 +1,7 @@
 package me.apon.notez.features.home;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
@@ -34,14 +36,15 @@ import me.apon.notez.utils.RxBus;
  * Created by yaopeng(aponone@gmail.com) on 2018/3/6.
  */
 
-public class MainViewModel extends ViewModel {
+public class MainViewModel extends AndroidViewModel {
     private AppDatabase appDatabase;
 
     private CompositeDisposable compositeDisposable;
 
-    public MainViewModel() {
+    public MainViewModel(Application application) {
+        super(application);
         compositeDisposable = new CompositeDisposable();
-        this.appDatabase = AppDatabase.getInstance(NoteApp.app);
+        this.appDatabase = AppDatabase.getInstance(application);
         initRxBus();
     }
 

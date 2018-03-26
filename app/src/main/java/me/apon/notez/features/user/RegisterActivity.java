@@ -87,6 +87,7 @@ public class RegisterActivity extends BaseActivity {
             case SUCCESS:
                 dismissLoadingDialog();
                 Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
+                finish();
                 break;
             case ERROR:
                 dismissLoadingDialog();

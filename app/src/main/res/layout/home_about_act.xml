@@ -30,9 +30,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="NOTEZ是蚂蚁笔记( http://leanote.org/ )的第三方Android客户端。"
+        android:padding="16dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="https://github.com/apon/notez"
-        android:inputType="textUri"
-        android:gravity="center"
         android:padding="16dp"/>
     <TextView
         android:layout_width="match_parent"

@@ -1,5 +1,7 @@
 package me.apon.notez.features.note;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
@@ -40,14 +42,15 @@ import okhttp3.RequestBody;
  * Created by yaopeng(aponone@gmail.com) on 2018/3/16.
  */
 
-public class NoteViewModel extends ViewModel{
+public class NoteViewModel extends AndroidViewModel {
     private AppDatabase appDatabase;
 
     private CompositeDisposable compositeDisposable;
 
-    public NoteViewModel() {
+    public NoteViewModel(Application application) {
+        super(application);
         compositeDisposable = new CompositeDisposable();
-        this.appDatabase = AppDatabase.getInstance(NoteApp.app);
+        this.appDatabase = AppDatabase.getInstance(application);
         initRxBus();
     }
 
