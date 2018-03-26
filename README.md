@@ -121,6 +121,9 @@ UserViewModel订阅Retrofit的Observable根据不同的状态设置LiveData。
 | ![](./screenshots/notez_03.png) | ![](./screenshots/notez_04.png) |
 
 
+APK下载:
+[https://fir.im/notez](https://fir.im/notez)
+
 
 
 # License
