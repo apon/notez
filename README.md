@@ -29,12 +29,12 @@ MVVM模式是Model-View-ViewMode模式的简称。由视图(View)、视图模型
 
 
 
-第一步，LoginActivity(View)获取UserViewModel实例。
+一，LoginActivity(View)获取UserViewModel实例。
 
 ```
 userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 ```
-第二步，订阅UserViewModel中登录相关的LiveData
+二，订阅UserViewModel中登录相关的LiveData
 
 
 ```
@@ -69,7 +69,7 @@ userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
     }
 ```
-第三部，LoginActivity(View)发起登录请求
+三，LoginActivity(View)发起登录请求
 
 ```
 userViewModel.Login(email, pwd);
@@ -78,7 +78,7 @@ userViewModel.Login(email, pwd);
 LoginActivity调用UserViewModel中的方法发起登录请求，请求返回的数据通过LiveData返回给LoginActivity。
 
 
-第四部，UserViewModel发起登录请求
+四，UserViewModel发起登录请求
 
 
 ```
