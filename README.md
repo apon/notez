@@ -2,10 +2,10 @@
 
 ![](./screenshots/logoz.png)
 
-NOTEZ是[蚂蚁笔记](http://leanote.org/)的第三方Android客户端。它基于Android框架组件(LiveData+ViewModel+Room)和网络全家桶(Okhttp+RxJava+Retrofit),以MVVM设计模式实现。它只是一个展示如何使用Android组件框架以MVVM设计模式构建APP的Demo。如果要使用蚂蚁笔记的Android客户端请其到官网下载。
+NOTEZ是[蚂蚁笔记](http://leanote.org/)的第三方Android客户端。它基于[Android框架组件](https://developer.android.com/topic/libraries/architecture/guide.html)(LiveData+ViewModel+Room)和网络全家桶(Okhttp+RxJava+Retrofit),以MVVM设计模式实现。它只是一个展示如何使用Android组件框架以MVVM设计模式构建APP的Demo。如果要使用蚂蚁笔记的Android客户端请其到官网下载。
 
 
-Notez现在使用自建服务器: [http://note.apon.me](http://note.apon.me)，可以在RetrofitClient.java修改，改成官方的[http://leanote.com
+Notez现在使用自建服务器: [http://note.apon.me](http://note.apon.me)，可以在RetrofitClient.java改成官方的[http://leanote.com
 ](http://leanote.com)
 蚂蚁笔记接口文档：https://github.com/leanote/leanote/wiki/leanote-api
 
